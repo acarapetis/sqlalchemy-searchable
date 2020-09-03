@@ -15,9 +15,9 @@ class SyncTriggerTestCase(TestCase):
             (name TEXT, content TEXT, "current_user" TEXT,
             search_vector TSVECTOR);
 
-            CREATE SCHEMA foreign;
+            CREATE SCHEMA another;
 
-            CREATE TABLE foreign.article
+            CREATE TABLE another.article
             (name TEXT, content TEXT, "current_user" TEXT,
             search_vector TSVECTOR);
             '''
@@ -25,8 +25,8 @@ class SyncTriggerTestCase(TestCase):
 
     def drop_tables(self):
         self.session.bind.execute('DROP TABLE article;'
-                                  'DROP TABLE foreign.article;'
-                                  'DROP SCHEMA foreign;')
+                                  'DROP TABLE another.article;'
+                                  'DROP SCHEMA another;')
 
     def test_creates_triggers_and_functions(self):
         conn = self.session.bind
@@ -50,13 +50,13 @@ class SyncTriggerTestCase(TestCase):
             'article',
             'search_vector',
             ['name', 'content'],
-            schema='foreign',
+            schema='another',
         )
         conn.execute(
-            '''INSERT INTO foreign.article (name, content)
+            '''INSERT INTO another.article (name, content)
             VALUES ('some name', 'some content')'''
         )
-        vector = conn.execute('SELECT search_vector FROM foreign.article'
+        vector = conn.execute('SELECT search_vector FROM another.article'
                               ).scalar()
         assert vector == "'content':4 'name':2"
 
