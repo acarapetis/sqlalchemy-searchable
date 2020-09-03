@@ -340,14 +340,14 @@ class SearchManager():
 
 search_manager = SearchManager()
 
-
 def sync_trigger(
     conn,
     table_name,
     tsvector_column,
     indexed_columns,
     metadata=None,
-    options=None
+    options=None,
+    schema=None,
 ):
     """
     Synchronizes search trigger and trigger function for given table and given
@@ -445,7 +445,8 @@ def sync_trigger(
         table_name,
         metadata,
         autoload=True,
-        autoload_with=conn
+        autoload_with=conn,
+        schema=schema,
     )
     params = dict(
         tsvector_column=getattr(table.c, tsvector_column),
@@ -473,7 +474,8 @@ def drop_trigger(
     table_name,
     tsvector_column,
     metadata=None,
-    options=None
+    options=None,
+    schema=None,
 ):
     """
     * Drops search trigger for given table (if it exists)
@@ -509,7 +511,8 @@ def drop_trigger(
         table_name,
         metadata,
         autoload=True,
-        autoload_with=conn
+        autoload_with=conn,
+        schema=schema,
     )
     params = dict(
         tsvector_column=getattr(table.c, tsvector_column),
