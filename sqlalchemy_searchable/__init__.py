@@ -340,6 +340,7 @@ class SearchManager():
 
 search_manager = SearchManager()
 
+
 def sync_trigger(
     conn,
     table_name,
