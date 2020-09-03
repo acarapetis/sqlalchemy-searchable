@@ -141,14 +141,18 @@ class SQLConstruct(object):
         if column.name in RESERVED_WORDS:
             column.name = quote_identifier(column.name)
         value = sa.text('NEW.{column}'.format(column=column.name))
+
+        raw = False
         try:
             vectorizer_func = vectorizer[column]
         except KeyError:
             pass
         else:
             value = vectorizer_func(value)
-        value = sa.func.coalesce(value, sa.text("''"))
-        value = sa.func.to_tsvector(self.options['regconfig'], value)
+            raw = getattr(vectorizer_func, '__raw_tsvector__', False)
+        if not raw:
+            value = sa.func.coalesce(value, sa.text("''"))
+            value = sa.func.to_tsvector(self.options['regconfig'], value)
         if column.name in self.options['weights']:
             weight = self.options['weights'][column.name]
             value = sa.func.setweight(value, weight)

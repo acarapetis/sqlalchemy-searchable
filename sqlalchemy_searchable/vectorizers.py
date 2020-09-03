@@ -140,10 +140,15 @@ class Vectorizer(object):
             return self.type_vectorizers[type_class]
         raise KeyError(column)
 
-    def __call__(self, type_or_column):
+    def __call__(self, type_or_column, raw_tsvector=False):
         """
         Decorator that marks given function as vectorizer for given column or
         type.
+
+        :param raw_tsvector:
+            if True, assume the given function returns type `tsvector`
+            directly.  Otherwise, the output of the vectorizer will be fed
+            through `to_tsvector`.
 
         In the following example we add vectorizer for HSTORE type.
 
@@ -161,6 +166,8 @@ class Vectorizer(object):
             @wraps(func)
             def wrapper(*args, **kwargs):
                 return func(*args, **kwargs)
+
+            wrapper.__raw_tsvector__ = raw_tsvector
 
             if (
                 isclass(type_or_column) and
